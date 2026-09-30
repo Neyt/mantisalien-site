@@ -20,7 +20,7 @@
 (function () {
   var CFG = window.MA_CONFIG = {
     META_PIXEL_ID: 'REPLACE_WITH_META_PIXEL_ID',
-    GA4_ID: 'REPLACE_WITH_GA4_MEASUREMENT_ID',
+    GA4_ID: 'G-R2T2K10EB9',
     GADS_ID: 'REPLACE_WITH_GOOGLE_ADS_ID',
     GADS_LABELS: { begin_checkout: '', generate_lead: '' },
     CURRENCY: 'USD'
