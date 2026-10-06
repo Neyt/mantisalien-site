@@ -25,7 +25,7 @@
     GA4_ID: 'G-R2T2K10EB9',
     GADS_ID: 'REPLACE_WITH_GOOGLE_ADS_ID',
     GADS_LABELS: { begin_checkout: '', generate_lead: '' },
-    CLARITY_ID: 'REPLACE_WITH_CLARITY_PROJECT_ID',
+    CLARITY_ID: 'yt87zcnroy',
     UET_ID: 'REPLACE_WITH_MICROSOFT_UET_TAG_ID',
     CURRENCY: 'USD'
   };
