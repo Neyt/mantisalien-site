@@ -1,11 +1,13 @@
 /*
- * Mantis Alien — tracking layer (Meta Pixel + Google Analytics 4 + Google Ads)
+ * Mantis Alien — tracking layer (Meta Pixel + Google Analytics 4 + Google Ads + Microsoft Clarity + Microsoft Ads UET)
  *
  * 1. Replace the placeholder IDs below with your real ones.
  *      META_PIXEL_ID : Meta Events Manager > Data sources > your Pixel > ID
  *      GA4_ID        : Google Analytics > Admin > Data streams > Measurement ID (G-XXXXXXXXXX)
  *      GADS_ID       : Google Ads > Tools > Conversions > tag ID (AW-XXXXXXXXX). Optional.
  *      GADS_LABELS   : conversion labels from Google Ads. Optional.
+ *      CLARITY_ID    : clarity.microsoft.com > Settings > Overview > Project ID (heatmaps + session recordings)
+ *      UET_ID        : Microsoft Advertising > Tools > UET tag > Tag ID (numbers only). Optional.
  * 2. Nothing loads until the visitor presses Accept in the consent banner.
  *    Placeholder IDs (starting with REPLACE) are skipped, so the site runs safely before setup.
  *
@@ -23,6 +25,8 @@
     GA4_ID: 'G-R2T2K10EB9',
     GADS_ID: 'REPLACE_WITH_GOOGLE_ADS_ID',
     GADS_LABELS: { begin_checkout: '', generate_lead: '' },
+    CLARITY_ID: 'REPLACE_WITH_CLARITY_PROJECT_ID',
+    UET_ID: 'REPLACE_WITH_MICROSOFT_UET_TAG_ID',
     CURRENCY: 'USD'
   };
 
@@ -58,6 +62,27 @@
     if (isReal(CFG.GADS_ID)) gtag('config', CFG.GADS_ID);
   }
 
+  function loadClarity() {
+    if (!isReal(CFG.CLARITY_ID)) return;
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+      t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, 'clarity', 'script', CFG.CLARITY_ID);
+    window.clarity('consent');
+  }
+
+  function loadUET() {
+    if (!isReal(CFG.UET_ID)) return;
+    (function (w, d, t, r, u) {
+      var f, n, i; w[u] = w[u] || [];
+      f = function () { var o = { ti: CFG.UET_ID, enableAutoSpaTracking: true }; o.q = w[u]; w[u] = new UET(o); w[u].push('pageLoad'); };
+      n = d.createElement(t); n.src = r; n.async = 1;
+      n.onload = n.onreadystatechange = function () { var s = this.readyState; s && s !== 'loaded' && s !== 'complete' || (f(), n.onload = n.onreadystatechange = null); };
+      i = d.getElementsByTagName(t)[0]; i.parentNode.insertBefore(n, i);
+    })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
+  }
+
   function fire(name, d) {
     d = d || {};
     var val = typeof d.value === 'number' ? d.value : undefined;
@@ -79,6 +104,12 @@
       var label = CFG.GADS_LABELS && CFG.GADS_LABELS[name];
       if (label && isReal(CFG.GADS_ID)) gtag('event', 'conversion', { send_to: CFG.GADS_ID + '/' + label, value: val, currency: cur });
     }
+    if (window.uetq && isReal(CFG.UET_ID) && name !== 'scroll_depth') {
+      window.uetq.push('event', name, { revenue_value: val, currency: cur });
+    }
+    if (window.clarity && isReal(CFG.CLARITY_ID)) {
+      window.clarity('event', name);
+    }
   }
 
   function track(name, data) {
@@ -92,14 +123,14 @@
     setConsent('granted');
     if (loaded) return;
     loaded = true;
-    loadMeta(); loadGoogle();
+    loadMeta(); loadGoogle(); loadClarity(); loadUET();
     while (queue.length) { var q = queue.shift(); fire(q[0], q[1]); }
   }
 
   function banner() {
     var el = document.createElement('div');
     el.className = 'ma-consent'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Cookie consent');
-    el.innerHTML = '<p>We use cookies from Meta and Google to measure our ads and see which pages work. Nothing loads unless you accept. <a href="privacy.html">Privacy</a></p>' +
+    el.innerHTML = '<p>We use cookies from Meta, Google and Microsoft to measure our ads and see which pages work. Nothing loads unless you accept. <a href="privacy.html">Privacy</a></p>' +
       '<button type="button" class="no">Decline</button><button type="button" class="yes">Accept</button>';
     document.body.appendChild(el);
     el.querySelector('.yes').onclick = function () { grant(); el.remove(); };
