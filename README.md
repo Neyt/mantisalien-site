@@ -25,6 +25,8 @@ Static site (no build step). Hosted on GitHub Pages.
 | Community entry confirmed | SubmitStory (custom) | submit_story |
 | Scroll 25/50/75/90% | ScrollDepth (custom) | scroll_depth |
 
+Microsoft Clarity (project `yt87zcnroy`) loads after consent and receives every event above as a Clarity custom event, so recordings can be filtered by e.g. `begin_checkout`.
+
 Tracking loads only after the visitor accepts the consent banner. UTM parameters are stored for the session and included in every emailed form entry so you can see which ad produced each lead.
 
 ## Ad URLs

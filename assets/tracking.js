@@ -1,5 +1,5 @@
 /*
- * Mantis Alien — tracking layer (Meta Pixel + Google Analytics 4 + Google Ads)
+ * Mantis Alien — tracking layer (Meta Pixel + Google Analytics 4 + Google Ads + Microsoft Clarity)
  *
  * 1. Replace the placeholder IDs below with your real ones.
  *      META_PIXEL_ID : Meta Events Manager > Data sources > your Pixel > ID
@@ -21,6 +21,7 @@
   var CFG = window.MA_CONFIG = {
     META_PIXEL_ID: 'REPLACE_WITH_META_PIXEL_ID',
     GA4_ID: 'G-R2T2K10EB9',
+    CLARITY_ID: 'yt87zcnroy',
     GADS_ID: 'REPLACE_WITH_GOOGLE_ADS_ID',
     GADS_LABELS: { begin_checkout: '', generate_lead: '' },
     CURRENCY: 'USD'
@@ -45,6 +46,16 @@
     fbq('track', 'PageView');
   }
 
+  function loadClarity() {
+    if (!isReal(CFG.CLARITY_ID)) return;
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+      t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, 'clarity', 'script', CFG.CLARITY_ID);
+    window.clarity('consent');
+  }
+
   function loadGoogle() {
     var id = isReal(CFG.GA4_ID) ? CFG.GA4_ID : (isReal(CFG.GADS_ID) ? CFG.GADS_ID : null);
     if (!id) return;
@@ -60,6 +71,7 @@
 
   function fire(name, d) {
     d = d || {};
+    if (window.clarity) { window.clarity('event', name); if (name === 'begin_checkout' && d.name) window.clarity('set', 'product', d.name); }
     var val = typeof d.value === 'number' ? d.value : undefined;
     var cur = CFG.CURRENCY;
     if (window.fbq && isReal(CFG.META_PIXEL_ID)) {
@@ -92,14 +104,14 @@
     setConsent('granted');
     if (loaded) return;
     loaded = true;
-    loadMeta(); loadGoogle();
+    loadMeta(); loadGoogle(); loadClarity();
     while (queue.length) { var q = queue.shift(); fire(q[0], q[1]); }
   }
 
   function banner() {
     var el = document.createElement('div');
     el.className = 'ma-consent'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Cookie consent');
-    el.innerHTML = '<p>We use cookies from Meta and Google to measure our ads and see which pages work. Nothing loads unless you accept. <a href="privacy.html">Privacy</a></p>' +
+    el.innerHTML = '<p>We use cookies from Meta, Google and Microsoft Clarity to measure our ads and see how the pages are used. Nothing loads unless you accept. <a href="privacy.html">Privacy</a></p>' +
       '<button type="button" class="no">Decline</button><button type="button" class="yes">Accept</button>';
     document.body.appendChild(el);
     el.querySelector('.yes').onclick = function () { grant(); el.remove(); };
