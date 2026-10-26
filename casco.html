@@ -26,7 +26,7 @@
   .lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#8A8880}
   .dot{width:8px;height:8px;border-radius:50%;background:#39FF6A;display:inline-block;margin-right:10px;box-shadow:0 0 12px #39FF6A}
   .hero{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:72px 0}
-  .hero img{width:100%;display:block;border:1px solid rgba(245,243,236,.2)}
+  .hero img,.panel img{width:100%;display:block;border:1px solid rgba(245,243,236,.2)}
   h1{margin:16px 0 20px;font-size:44px;line-height:1.15;font-weight:400;letter-spacing:.05em}
   h2{font-size:20px;font-weight:400;letter-spacing:.08em;margin:0 0 24px}
   p.lead{font-size:18px;line-height:1.7;font-weight:300;color:#CFCBC0}
@@ -46,6 +46,14 @@
   .two img{width:100%;border:1px solid rgba(245,243,236,.2)}
   ul.q{padding-left:20px;line-height:2;color:#CFCBC0;font-size:16px}
   footer{border-top:1px solid rgba(245,243,236,.18);padding:32px 0;color:#8A8880;font-size:12px}
+  .tabs{display:flex;gap:0;border:1px solid rgba(245,243,236,.2);border-bottom:0}
+  .tabs button{flex:1;background:transparent;color:#8A8880;border:0;border-right:1px solid rgba(245,243,236,.2);padding:14px 8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+  .tabs button:last-child{border-right:0}
+  .tabs button[aria-selected="true"]{color:#0A0A0A;background:#39FF6A}
+  .tabs button:hover:not([aria-selected="true"]){color:#F5F3EC}
+  .tabs button:focus-visible{outline:2px solid #39FF6A;outline-offset:-2px}
+  .panel[hidden]{display:none}
+  .panel p{margin:12px 0 0;font-size:13px;line-height:1.5;color:#8A8880}
   @media (max-width:820px){
     .wrap{padding:0 16px}.hero,.two{grid-template-columns:1fr;gap:32px}.hero{padding:40px 0}
     h1{font-size:30px}
@@ -66,7 +74,25 @@
       <p class="lead">Buscamos un taller que fabrique el casco para los shows de DJ en vivo de Mantis Alien. Va impreso en 3D, con ojos LED verdes y ventilación, y tiene que aguantar sets de 60 a 90 minutos bajo luces y láser.</p>
       <p style="margin-top:32px"><a class="btn" href="https://wa.me/593981872561?text=Hola%2C%20vi%20el%20brief%20del%20casco%20Mantis%20Alien%20y%20quiero%20cotizar." target="_blank" rel="noopener">Quiero cotizar</a></p>
     </div>
-    <img src="assets/casco/casco-b.jpg" alt="Concepto del casco Mantis Alien: negro cromo con ojos LED verdes">
+    <div class="designs">
+      <div class="tabs" role="tablist" aria-label="Diseños del casco">
+        <button type="button" role="tab" id="t-a" aria-controls="p-a" aria-selected="false" tabindex="-1">A · Hueso</button>
+        <button type="button" role="tab" id="t-b" aria-controls="p-b" aria-selected="true">B · Negro cromo</button>
+        <button type="button" role="tab" id="t-c" aria-controls="p-c" aria-selected="false" tabindex="-1">C · Manuscrito</button>
+      </div>
+      <div class="panel" role="tabpanel" id="p-a" aria-labelledby="t-a" hidden>
+        <img src="assets/casco/casco-a.jpg" alt="Diseño A del casco Mantis Alien: carcasa blanco hueso con líneas grabadas y ojos negros con LED verde" loading="lazy">
+        <p>Diseño A. Carcasa blanco hueso mate con líneas grabadas, ojos negros brillantes con LED verde por dentro y antenas delgadas.</p>
+      </div>
+      <div class="panel" role="tabpanel" id="p-b" aria-labelledby="t-b">
+        <img src="assets/casco/casco-b.jpg" alt="Diseño B del casco Mantis Alien: negro cromo con ojos LED verdes">
+        <p>Diseño B, base de este brief. Negro cromo, visor ahumado de una pieza con forma de ojos de mantis y líneas LED verdes.</p>
+      </div>
+      <div class="panel" role="tabpanel" id="p-c" aria-labelledby="t-c" hidden>
+        <img src="assets/casco/casco-c.jpg" alt="Diseño C del casco Mantis Alien: laca negra con ornamentos rojo óxido y dorado y ojos dorados" loading="lazy">
+        <p>Diseño C. Laca negra con ornamentos grabados en rojo óxido y dorado, ojos dorados reflectivos y mandala en la frente.</p>
+      </div>
+    </div>
   </div>
 
   <section>
@@ -115,6 +141,18 @@
 </main>
 
 <footer><div class="wrap">Mantis Alien · Quito, Ecuador · mantisalien.com</div></footer>
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.tabs [role="tab"]'));
+  function show(t){
+    tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});
+  }
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){show(t)});
+    t.addEventListener('keydown',function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;var n=tabs[(i+d+tabs.length)%tabs.length];show(n);n.focus();e.preventDefault();});
+  });
+})();
+</script>
 <script src="assets/tracking.js" defer></script>
 </body>
 </html>
